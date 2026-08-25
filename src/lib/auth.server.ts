@@ -5,6 +5,7 @@ import {
   userTable,
   verificationTable,
 } from '#/db/schema/auth-schema.server.ts'
+import { sendMagicLink } from '#/email/index.tsx'
 import { serverEnv } from '#/lib/env/env.server.ts'
 import type { ErrorMessageKey, SuccessMessageKey } from '#/lib/message.ts'
 import { errorMessage, successMessage } from '#/lib/message.ts'
@@ -13,8 +14,8 @@ import { setFlashMessage } from '#/lib/session.server.ts'
 import { writeAppLog } from '#/lib/utils.server.ts'
 import { usernameZodSchema } from '#/zod-schema/username.ts'
 import { redisStorage } from '@better-auth/redis-storage'
-import { betterAuth } from 'better-auth'
 import type { BetterAuthOptions } from 'better-auth'
+import { betterAuth } from 'better-auth'
 import { localization } from 'better-auth-localization'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { createAuthMiddleware } from 'better-auth/api'
@@ -55,6 +56,14 @@ const betterAuthOptions = {
       storeToken: 'hashed',
       async sendMagicLink({ email, url }) {
         if (serverEnv.APP_ENV === 'production') {
+          sendMagicLink({ to: email, url }).catch((error) => {
+            const errorMessage =
+              error instanceof Error ? error.message : String(error)
+
+            writeAppLog({
+              content: `=== MAGIC LINK ===\n[error] ${errorMessage}\n`,
+            })
+          })
         } else {
           await writeAppLog({
             content: `=== MAGIC LINK ===\n[email] ${email}\n[url]\n${url}\n`,
