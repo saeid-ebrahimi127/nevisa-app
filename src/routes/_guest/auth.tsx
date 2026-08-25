@@ -46,7 +46,7 @@ function RouteComponent() {
             try {
               const { error } = await authClient.signIn.magicLink({
                 ...data,
-                name: '',
+                name: 'بی نام',
                 callbackURL: '/?success=loggedIn',
                 newUserCallbackURL: '/?success=newUser',
                 errorCallbackURL: '/auth',

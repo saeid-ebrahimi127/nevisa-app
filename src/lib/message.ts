@@ -23,6 +23,7 @@ export const successMessage = {
   magicLinkSent: 'ایمیل حاوی لینک جادویی برای شما ارسال شد.',
   newUser: 'ثبت نام انجام شد. خوش آمدید.',
   loggedIn: 'شما وارد شدید.',
+  loggedOut: 'شما خارج شدید.',
 }
 
 export type SuccessMessageKey = keyof typeof successMessage
