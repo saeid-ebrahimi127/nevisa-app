@@ -1,10 +1,13 @@
-import { getBetterAuthSession } from '#/lib/session.server.ts'
+import { getBetterAuthSession, getFlashMessage } from '#/lib/session.server.ts'
 import { createServerFn } from '@tanstack/react-start'
 import type { User } from 'better-auth'
 
 export const getAppBootstrapData = createServerFn({ method: 'GET' }).handler(
   async () => {
-    const betterAuthSession = await getBetterAuthSession()
+    const [betterAuthSession, flashMessage] = await Promise.all([
+      getBetterAuthSession(),
+      getFlashMessage(),
+    ])
 
     let user: Pick<User, 'name'> | null = null
 
@@ -16,6 +19,6 @@ export const getAppBootstrapData = createServerFn({ method: 'GET' }).handler(
       user = { name }
     }
 
-    return { user }
+    return { user, flashMessage }
   },
 )

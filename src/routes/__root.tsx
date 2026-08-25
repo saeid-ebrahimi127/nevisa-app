@@ -17,6 +17,8 @@ import { TooltipProvider } from '#/components/ui/tooltip.tsx'
 import { pageTitle } from '#/lib/head.ts'
 import { getAppBootstrapData } from '#/serverfn/app-bootstrap-data.ts'
 import type { QueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -45,13 +47,21 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   }),
   shellComponent: RootDocument,
   async beforeLoad() {
-    const { user } = await getAppBootstrapData()
+    const { user, flashMessage } = await getAppBootstrapData()
 
-    return { user }
+    return { user, flashMessage }
   },
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const { flashMessage } = Route.useRouteContext()
+
+  useEffect(() => {
+    if (flashMessage) {
+      toast[flashMessage.type](flashMessage.text)
+    }
+  }, [flashMessage])
+
   return (
     <html lang="fa-IR" dir="rtl">
       <head>
