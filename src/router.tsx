@@ -1,6 +1,8 @@
 import { createRouter as createTanStackRouter } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
 
+import { ErrorComponent } from '#/components/error-component.tsx'
+import { NotFound } from '#/components/not-found.tsx'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 import { getContext } from './integrations/tanstack-query/root-provider'
 
@@ -14,7 +16,18 @@ export function getRouter() {
     defaultPreload: false,
     defaultPreloadStaleTime: 0,
     defaultNotFoundComponent() {
-      return null
+      return (
+        <div className="my-16">
+          <NotFound />
+        </div>
+      )
+    },
+    defaultErrorComponent({ reset }) {
+      return (
+        <div className="my-16">
+          <ErrorComponent reset={reset} />
+        </div>
+      )
     },
   })
 
