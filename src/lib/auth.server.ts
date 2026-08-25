@@ -11,15 +11,20 @@ import { errorMessage, successMessage } from '#/lib/message.ts'
 import { getRedisClient } from '#/lib/redis.server.ts'
 import { setFlashMessage } from '#/lib/session.server.ts'
 import { writeAppLog } from '#/lib/utils.server.ts'
+import { usernameZodSchema } from '#/zod-schema/username.ts'
 import { redisStorage } from '@better-auth/redis-storage'
 import { betterAuth } from 'better-auth'
+import type { BetterAuthOptions } from 'better-auth'
 import { localization } from 'better-auth-localization'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { createAuthMiddleware } from 'better-auth/api'
-import { magicLink } from 'better-auth/plugins'
+import { customSession, magicLink, username } from 'better-auth/plugins'
 import { tanstackStartCookies } from 'better-auth/tanstack-start'
+import { customAlphabet } from 'nanoid'
 
-export const auth = betterAuth({
+const nanoid = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz_-', 15)
+
+const betterAuthOptions = {
   appName: serverEnv.APP_NAME,
   baseURL: serverEnv.BETTER_AUTH_BASE_URL,
   secret: serverEnv.BETTER_AUTH_SECRET,
@@ -40,6 +45,11 @@ export const auth = betterAuth({
       defaultLocale: 'fa-IR',
       fallbackLocale: 'default',
     }),
+    username({
+      usernameValidator(value) {
+        return usernameZodSchema.safeParse(value).success
+      },
+    }),
     magicLink({
       expiresIn: 5 * 60,
       storeToken: 'hashed',
@@ -52,7 +62,6 @@ export const auth = betterAuth({
         }
       },
     }),
-    tanstackStartCookies(),
   ],
   advanced: {
     database: { generateId: false },
@@ -116,4 +125,31 @@ export const auth = betterAuth({
       },
     },
   },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          return { data: { ...user, username: `user_${nanoid()}` } }
+        },
+      },
+    },
+  },
+} satisfies BetterAuthOptions
+
+export const auth = betterAuth({
+  ...betterAuthOptions,
+  plugins: [
+    ...betterAuthOptions.plugins,
+    customSession(async ({ user, session }) => {
+      const { displayUsername: _, ...userRest } = user
+      return {
+        user: {
+          ...userRest,
+          username: userRest.username!,
+        },
+        session,
+      }
+    }, betterAuthOptions),
+    tanstackStartCookies(),
+  ],
 })

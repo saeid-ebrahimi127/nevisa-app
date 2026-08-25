@@ -35,11 +35,13 @@ try {
       email: 'saeid@example.com',
       emailVerified: true,
       role: 'super_admin',
+      username: 'saeid123',
     },
     {
       name: 'dave',
       email: 'dave@example.com',
       emailVerified: true,
+      username: 'dave123',
     },
   ]
 

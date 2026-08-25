@@ -26,6 +26,7 @@ export const userTable = pgTable('user', {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
   role: text('role', { enum: userRoleEnum }).notNull().default('subscriber'),
+  username: text('username').notNull().unique(),
 })
 
 export const sessionTable = pgTable(
