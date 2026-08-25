@@ -71,7 +71,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <DirectionProvider dir="rtl">
           <TooltipProvider>
             <Header />
-            <main>{children}</main>
+            <main className="p-8">{children}</main>
           </TooltipProvider>
           <Toaster
             className="pointer-events-auto font-sans!"

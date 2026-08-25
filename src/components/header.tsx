@@ -12,7 +12,7 @@ export const Header = () => {
   const { user } = useRouteContext({ from: '__root__' })
 
   return (
-    <header className="sticky top-0 flex items-center justify-between gap-4 border-b bg-white p-4 px-8">
+    <header className="sticky top-0 flex h-(--header-height) items-center justify-between gap-4 border-b bg-white p-4 px-8">
       <Logo />
       {user ? null : (
         <Tooltip>
