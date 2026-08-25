@@ -27,3 +27,7 @@ export const successMessage = {
 }
 
 export type SuccessMessageKey = keyof typeof successMessage
+
+export const createTooManyRequestsErrorMessage = (msBeforeNext: number) => {
+  return `تعداد دفعات تلاش بیش از حد مجاز است. لطفا پس از ${Math.floor(msBeforeNext / 1000)} ثانیه ی دیگر مجددا تلاش نمایید.`
+}

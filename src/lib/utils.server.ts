@@ -1,5 +1,6 @@
 import { serverEnv } from '#/lib/env/env.server.ts'
 import { appendFile, mkdir, writeFile } from 'node:fs/promises'
+import { isIP } from 'node:net'
 import { resolve } from 'node:path'
 
 const logDirPath = resolve(process.cwd(), 'log')
@@ -29,4 +30,29 @@ export const devWipeAppLog = async () => {
   await ensureLogDirExists()
 
   await writeFile(appLogFilePath, '', 'utf-8')
+}
+
+export const getClientIP = (request: Request): string => {
+  const headers = [
+    'cf-connecting-ip',
+    'true-client-ip',
+    'fastly-client-ip',
+    'x-real-ip',
+    'x-client-ip',
+    'x-forwarded-for',
+  ]
+
+  for (const header of headers) {
+    const value = request.headers.get(header)
+
+    if (!value) continue
+
+    const ip = value.split(',')[0]?.trim()
+
+    if (ip && isIP(ip)) {
+      return ip
+    }
+  }
+
+  return 'unknown'
 }

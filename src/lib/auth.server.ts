@@ -1,3 +1,4 @@
+import { handleBetterAuthRateLimiting } from '#/better-auth/rate-limiter.ts'
 import { getDb } from '#/db/index.server.ts'
 import {
   accountTable,
@@ -79,6 +80,35 @@ const betterAuthOptions = {
     enabled: false,
   },
   hooks: {
+    before: createAuthMiddleware(async ({ request, path }) => {
+      if (!request) return
+
+      const pathsToBeRateLimited_throwError = ['/sign-in/magic-link']
+
+      const pathsToBeRateLimited_returnResponse: Record<string, string> = {
+        '/magic-link/verify': '/auth',
+      }
+
+      if (pathsToBeRateLimited_throwError.includes(path)) {
+        await handleBetterAuthRateLimiting(path, request)
+      }
+
+      const redirectTo = pathsToBeRateLimited_returnResponse[path]
+
+      if (redirectTo) {
+        const response = await handleBetterAuthRateLimiting(
+          path,
+          request,
+          undefined,
+          false,
+          redirectTo,
+        )
+
+        if (response) {
+          return response
+        }
+      }
+    }),
     after: createAuthMiddleware(async ({ context }) => {
       const returned = context.returned as { headers?: Headers } | null
 
