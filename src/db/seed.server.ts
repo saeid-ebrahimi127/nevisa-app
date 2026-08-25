@@ -1,5 +1,6 @@
 import { getDb } from '#/db/index.server.ts'
 import { userTable, verificationTable } from '#/db/schema/auth-schema.server.ts'
+import type { UserInsert } from '#/db/types.ts'
 import { serverEnv } from '#/lib/env/env.server.ts'
 import { devClearAppRedisCache } from '#/lib/redis.server.ts'
 import { devWipeAppLog } from '#/lib/utils.server.ts'
@@ -28,11 +29,12 @@ try {
   const userStepMs = 60 * 60 * 1000 // 1 hour apart
 
   console.log('seeding users...')
-  const userSeeds = [
+  const userSeeds: UserInsert[] = [
     {
       name: 'سعید',
       email: 'saeid@example.com',
       emailVerified: true,
+      role: 'super_admin',
     },
     {
       name: 'dave',

@@ -6,8 +6,8 @@ import {
   verificationTable,
 } from '#/db/schema/auth-schema.server.ts'
 import { serverEnv } from '#/lib/env/env.server.ts'
-import { errorMessage, successMessage } from '#/lib/message.ts'
 import type { ErrorMessageKey, SuccessMessageKey } from '#/lib/message.ts'
+import { errorMessage, successMessage } from '#/lib/message.ts'
 import { getRedisClient } from '#/lib/redis.server.ts'
 import { setFlashMessage } from '#/lib/session.server.ts'
 import { writeAppLog } from '#/lib/utils.server.ts'
@@ -108,4 +108,12 @@ export const auth = betterAuth({
     client: getRedisClient(),
     keyPrefix: 'better-auth:',
   }),
+  user: {
+    additionalFields: {
+      role: {
+        type: 'string',
+        fieldName: 'role',
+      },
+    },
+  },
 })

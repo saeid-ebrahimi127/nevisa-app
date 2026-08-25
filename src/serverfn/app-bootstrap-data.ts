@@ -1,3 +1,4 @@
+import type { UserRole } from '#/lib/const.ts'
 import { getBetterAuthSession, getFlashMessage } from '#/lib/session.server.ts'
 import { createServerFn } from '@tanstack/react-start'
 import type { User } from 'better-auth'
@@ -9,14 +10,14 @@ export const getAppBootstrapData = createServerFn({ method: 'GET' }).handler(
       getFlashMessage(),
     ])
 
-    let user: Pick<User, 'name'> | null = null
+    let user: (Pick<User, 'name'> & { role: UserRole }) | null = null
 
     if (betterAuthSession) {
       const {
-        user: { name },
+        user: { name, ...userRest },
       } = betterAuthSession
 
-      user = { name }
+      user = { name, role: userRest.role as UserRole }
     }
 
     return { user, flashMessage }

@@ -1,3 +1,4 @@
+import { userRoleEnum } from '#/lib/const.ts'
 import { sql } from 'drizzle-orm'
 import {
   boolean,
@@ -24,6 +25,7 @@ export const userTable = pgTable('user', {
     .$defaultFn(() => new Date())
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
+  role: text('role', { enum: userRoleEnum }).notNull().default('subscriber'),
 })
 
 export const sessionTable = pgTable(
