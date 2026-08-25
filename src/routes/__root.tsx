@@ -10,10 +10,12 @@ import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
 import appCss from '../styles.css?url'
 
+import { Header } from '#/components/header.tsx'
 import { DirectionProvider } from '#/components/ui/direction.tsx'
 import { Toaster } from '#/components/ui/sonner.tsx'
 import { TooltipProvider } from '#/components/ui/tooltip.tsx'
 import { pageTitle } from '#/lib/head.ts'
+import { getAppBootstrapData } from '#/serverfn/app-bootstrap-data.ts'
 import type { QueryClient } from '@tanstack/react-query'
 
 interface MyRouterContext {
@@ -42,6 +44,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
   }),
   shellComponent: RootDocument,
+  async beforeLoad() {
+    const { user } = await getAppBootstrapData()
+
+    return { user }
+  },
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
@@ -53,6 +60,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body className="w-full overflow-x-hidden bg-emerald-50 font-sans antialiased">
         <DirectionProvider dir="rtl">
           <TooltipProvider>
+            <Header />
             <main>{children}</main>
           </TooltipProvider>
           <Toaster
