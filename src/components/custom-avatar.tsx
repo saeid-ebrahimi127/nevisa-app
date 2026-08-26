@@ -1,22 +1,26 @@
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar.tsx'
 import { cn } from '#/lib/utils.ts'
 
-export const UserAvatar = ({
-  user: { name, image },
+export const CustomAvatar = ({
   className,
+  src,
+  alt,
   fallbackClassName,
+  fallback,
 }: {
-  user: { name: string; image?: string }
   className?: string
+  src: string | undefined
+  alt: string
   fallbackClassName?: string
+  fallback: string
 }) => {
   return (
     <Avatar className={className}>
-      <AvatarImage src={image} alt={`عکس کاربری ${name}`} />
+      <AvatarImage src={src} alt={alt} />
       <AvatarFallback
         className={cn('bg-primary text-white capitalize', fallbackClassName)}
       >
-        {name[0]}
+        {fallback}
       </AvatarFallback>
     </Avatar>
   )

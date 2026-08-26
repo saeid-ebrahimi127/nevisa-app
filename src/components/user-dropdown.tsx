@@ -1,3 +1,4 @@
+import { CustomAvatar } from '#/components/custom-avatar.tsx'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,7 +8,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu.tsx'
-import { UserAvatar } from '#/components/user-avatar.tsx'
 import type { UserRole } from '#/lib/const.ts'
 import { Link } from '@tanstack/react-router'
 import { Loader2Icon, LogOutIcon, UserIcon } from 'lucide-react'
@@ -35,15 +35,21 @@ export const UserDropdown = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <UserAvatar user={{ name, image }} />
+        <CustomAvatar
+          src={image || undefined}
+          alt={`عکس کاربری ${name}`}
+          fallback={name[0]!}
+        />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-54" align="end">
         <DropdownMenuGroup>
           <DropdownMenuLabel className="flex items-center gap-2">
-            <UserAvatar
+            <CustomAvatar
+              src={image || undefined}
+              alt={`عکس کاربری ${name}`}
+              fallback={name[0]!}
               className="size-10"
               fallbackClassName="text-base"
-              user={{ name, image }}
             />
             <div className="min-w-0 space-y-1">
               <div className="truncate text-sm text-black">{name}</div>
@@ -55,7 +61,7 @@ export const UserDropdown = ({
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link to="/account">
+            <Link to="/account" search={{ tab: 'general-info' }}>
               <UserIcon />
               حساب کاربری
             </Link>

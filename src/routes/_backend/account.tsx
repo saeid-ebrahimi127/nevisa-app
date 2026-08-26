@@ -1,3 +1,4 @@
+import { AccountAvatar } from '#/components/account/avatar.tsx'
 import { AccountGeneralInfo } from '#/components/account/general-info.tsx'
 import {
   Tabs,
@@ -21,7 +22,7 @@ export const Route = createFileRoute('/_backend/account')({
         tabTranslation = 'اطلاعات عمومی'
         break
       case 'avatar':
-        tabTranslation = 'تصویر کاربری'
+        tabTranslation = 'عکس کاربری'
         break
     }
 
@@ -52,7 +53,9 @@ function RouteComponent() {
       <TabsContent value="general-info">
         <AccountGeneralInfo />
       </TabsContent>
-      <TabsContent value="avatar"></TabsContent>
+      <TabsContent value="avatar">
+        <AccountAvatar />
+      </TabsContent>
     </Tabs>
   )
 }

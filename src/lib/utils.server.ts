@@ -1,5 +1,6 @@
 import { serverEnv } from '#/lib/env/env.server.ts'
-import { appendFile, mkdir, writeFile } from 'node:fs/promises'
+import { nanoid } from 'nanoid'
+import { appendFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { isIP } from 'node:net'
 import { resolve } from 'node:path'
 
@@ -55,4 +56,57 @@ export const getClientIP = (request: Request): string => {
   }
 
   return 'unknown'
+}
+
+const uploadsDirPath = resolve(process.cwd(), 'uploads')
+const uploadsImagesDirPath = resolve(uploadsDirPath, 'images')
+
+export const ensureUploadsImagesDirExists = async () => {
+  await mkdir(uploadsImagesDirPath, { recursive: true })
+}
+
+export const storeImage = async (
+  input: ConstructorParameters<typeof Bun.Image>[0],
+  width: number,
+  height?: number,
+  options?: Bun.Image.ResizeOptions,
+) => {
+  const fileName = `${nanoid()}.webp`
+
+  await ensureUploadsImagesDirExists()
+
+  await new Bun.Image(input)
+    .resize(width, height, options)
+    .webp()
+    .write(resolve(uploadsImagesDirPath, fileName))
+
+  return { fileName }
+}
+
+export const deleteImage = async (path: string) => {
+  if (path.startsWith(new URL('/api/image', serverEnv.APP_URL).toString())) {
+    const fileName = path.split('/').at(-1)
+
+    if (fileName) {
+      await ensureUploadsImagesDirExists()
+
+      await rm(resolve(uploadsImagesDirPath, fileName), { force: true })
+    }
+  }
+}
+
+export const getLocalImage = (fileName: string) => {
+  return readFile(resolve(uploadsImagesDirPath, fileName))
+}
+
+export const devWipeAppUploads = async () => {
+  if (serverEnv.APP_ENV === 'production') {
+    console.error("you can't wipe app's uploads in production.")
+
+    return
+  }
+
+  await Promise.all([
+    rm(uploadsImagesDirPath, { recursive: true, force: true }),
+  ])
 }
