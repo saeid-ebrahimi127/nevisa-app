@@ -29,7 +29,11 @@ export const Route = createFileRoute('/_backend/account')({
     return { meta: [{ title: pageTitle(`حساب کاربری - ${tabTranslation}`) }] }
   },
   validateSearch: z.object({
-    tab: z.literal(['general-info', 'avatar']).catch('general-info'),
+    tab: z
+      .literal(['general-info', 'avatar'])
+      .optional()
+      .default('general-info')
+      .catch('general-info'),
   }),
 })
 

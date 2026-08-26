@@ -61,7 +61,7 @@ export const UserDropdown = ({
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link to="/account" search={{ tab: 'general-info' }}>
+            <Link to="/account">
               <UserIcon />
               حساب کاربری
             </Link>
