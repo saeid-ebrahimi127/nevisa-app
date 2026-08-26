@@ -5,6 +5,7 @@ export const errorMessage = {
   INVALID_TOKEN: 'توکن نامعتبر است. دوباره درخواست توکن کنید.',
   TOKEN_EXPIRED: 'توکن منقضی شده است. دوباره درخواست توکن کنید.',
   generic: 'خطایی رخ داده است. دوباره تلاش کنید.',
+  USERNAME_IS_ALREADY_TAKEN: 'نام کاربری مورد نظر قبلا استفاده شده است.',
 }
 
 export type ErrorMessageKey = keyof typeof errorMessage
@@ -24,6 +25,7 @@ export const successMessage = {
   newUser: 'ثبت نام انجام شد. خوش آمدید.',
   loggedIn: 'شما وارد شدید.',
   loggedOut: 'شما خارج شدید.',
+  changesSaved: 'تغییرات ذخیره شد.',
 }
 
 export type SuccessMessageKey = keyof typeof successMessage
