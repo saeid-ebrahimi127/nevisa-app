@@ -2,7 +2,7 @@ import { auth } from '#/lib/auth.server.ts'
 import { serverEnv } from '#/lib/env/env.server.ts'
 import { errorMessage } from '#/lib/message.ts'
 import { deleteImage, storeImage } from '#/lib/utils.server.ts'
-import { createRequireAuthMiddleware } from '#/middleware/require-auth.ts'
+import { createRateLimiterMiddlewareForAuthenticatedUsers } from '#/middleware/rate-limiter.ts'
 import { avatarZodSchema } from '#/zod-schema/image.ts'
 import { createFileRoute } from '@tanstack/react-router'
 import { getRequestHeaders } from '@tanstack/react-start/server'
@@ -13,8 +13,23 @@ export const Route = createFileRoute('/api/avatar')({
     handlers({ createHandlers }) {
       return createHandlers({
         POST: {
-          middleware: [createRequireAuthMiddleware({ throwError: false })],
-          async handler({ request, context: { currentUser } }) {
+          middleware: [
+            createRateLimiterMiddlewareForAuthenticatedUsers({
+              requireAuthMiddleware_throwError: false,
+              key: 'avatar',
+            }),
+          ],
+          async handler({
+            request,
+            context: { currentUser, rateLimiterErrorMessage },
+          }) {
+            if (rateLimiterErrorMessage) {
+              return Response.json(
+                { errorMessage: rateLimiterErrorMessage },
+                { status: 429 },
+              )
+            }
+
             try {
               const formData = await request.formData()
 
@@ -62,8 +77,20 @@ export const Route = createFileRoute('/api/avatar')({
           },
         },
         DELETE: {
-          middleware: [createRequireAuthMiddleware({ throwError: false })],
-          async handler({ context: { currentUser } }) {
+          middleware: [
+            createRateLimiterMiddlewareForAuthenticatedUsers({
+              requireAuthMiddleware_throwError: false,
+              key: 'avatar',
+            }),
+          ],
+          async handler({ context: { currentUser, rateLimiterErrorMessage } }) {
+            if (rateLimiterErrorMessage) {
+              return Response.json(
+                { errorMessage: rateLimiterErrorMessage },
+                { status: 429 },
+              )
+            }
+
             try {
               if (currentUser.image) {
                 const prevAvatar = currentUser.image

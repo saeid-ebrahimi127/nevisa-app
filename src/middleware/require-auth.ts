@@ -1,10 +1,13 @@
+import type { UserRole } from '#/lib/const.ts'
 import { getBetterAuthSession } from '#/lib/session.server.ts'
 import { redirect } from '@tanstack/react-router'
 import { createMiddleware } from '@tanstack/react-start'
 
-export const createRequireAuthMiddleware = (
-  { throwError }: { throwError: boolean } = { throwError: true },
-) => {
+export const createRequireAuthMiddleware = ({
+  throwError = true,
+}: {
+  throwError?: boolean
+}) => {
   return createMiddleware({ type: 'request' }).server(async ({ next }) => {
     const betterAuthSession = await getBetterAuthSession()
 
@@ -16,6 +19,10 @@ export const createRequireAuthMiddleware = (
 
     const { user } = betterAuthSession
 
-    return next({ context: { currentUser: { image: user.image } } })
+    return next({
+      context: {
+        currentUser: { image: user.image, role: user.role as UserRole },
+      },
+    })
   })
 }

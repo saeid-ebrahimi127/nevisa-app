@@ -1,10 +1,11 @@
+import type { UserRole } from '#/lib/const.ts'
 import { serverEnv } from '#/lib/env/env.server.ts'
 import {
   createTooManyRequestsErrorMessage,
   errorMessage,
 } from '#/lib/message.ts'
 import { createRateLimiter } from '#/lib/rate-limiter.server.ts'
-import { setFlashMessage } from '#/lib/session.server.ts'
+import { getBetterAuthSession, setFlashMessage } from '#/lib/session.server.ts'
 import { getClientIP } from '#/lib/utils.server.ts'
 import { APIError } from 'better-auth'
 import { RateLimiterRes } from 'rate-limiter-flexible'
@@ -40,6 +41,14 @@ export async function handleBetterAuthRateLimiting(
   redirectTo?: string,
 ): Promise<Response | undefined> {
   try {
+    const betterAuthSession = await getBetterAuthSession()
+
+    if (betterAuthSession?.user) {
+      const { role } = betterAuthSession.user as { role: UserRole }
+
+      if (role === 'super_admin') return
+    }
+
     await createRateLimiter({ duration, points }).consume(
       `${key}:${getClientIP(request)}`,
     )

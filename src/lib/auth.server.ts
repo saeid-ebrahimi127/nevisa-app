@@ -83,7 +83,10 @@ const betterAuthOptions = {
     before: createAuthMiddleware(async ({ request, path }) => {
       if (!request) return
 
-      const pathsToBeRateLimited_throwError = ['/sign-in/magic-link']
+      const pathsToBeRateLimited_throwError = [
+        '/sign-in/magic-link',
+        '/update-user',
+      ]
 
       const pathsToBeRateLimited_returnResponse: Record<string, string> = {
         '/magic-link/verify': '/auth',
