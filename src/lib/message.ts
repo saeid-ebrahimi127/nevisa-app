@@ -8,6 +8,9 @@ export const errorMessage = {
   USERNAME_IS_ALREADY_TAKEN: 'نام کاربری مورد نظر قبلا استفاده شده است.',
   sessionInvalidOrExpired:
     'نشست شما نامعتبر بوده یا منقضی شده است. دوباره وارد شوید.',
+  failedDeletingMyAccount: 'خطا در حذف حساب کاربری شما! دوباره تلاش کنید.',
+  actionNeedsReLogin:
+    'انجام این عملیات نیازمند ورود مجدد است. برای ادامه از حساب کاربری خود خارج شده و دوباره وارد شوید.',
 }
 
 export type ErrorMessageKey = keyof typeof errorMessage
@@ -30,6 +33,7 @@ export const successMessage = {
   changesSaved: 'تغییرات ذخیره شد.',
   yourAvatarSaved: 'عکس کاربری شما ذخیره شد.',
   yourAvatarDeleted: 'عکس کاربری شما حذف شد.',
+  yourAccountDeleted: 'حساب کاربری شما حذف شد.',
 }
 
 export type SuccessMessageKey = keyof typeof successMessage

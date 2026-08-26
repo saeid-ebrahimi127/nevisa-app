@@ -17,11 +17,18 @@ export const createRequireAuthMiddleware = ({
       return new Response(undefined, { status: 401 })
     }
 
-    const { user } = betterAuthSession
+    const { user, session } = betterAuthSession
 
     return next({
       context: {
-        currentUser: { image: user.image, role: user.role as UserRole },
+        currentUser: {
+          id: user.id,
+          image: user.image,
+          role: user.role as UserRole,
+        },
+        currentSession: {
+          createdAt: session.createdAt,
+        },
       },
     })
   })
