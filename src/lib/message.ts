@@ -11,6 +11,8 @@ export const errorMessage = {
   failedDeletingMyAccount: 'خطا در حذف حساب کاربری شما! دوباره تلاش کنید.',
   actionNeedsReLogin:
     'انجام این عملیات نیازمند ورود مجدد است. برای ادامه از حساب کاربری خود خارج شده و دوباره وارد شوید.',
+  newEmailAndCurrentEmailAreEqual: 'ایمیل جدید و فعلی یکسان هستند.',
+  emailIsAlreadyTaken: 'ایمیل مورد نظر قبلا استفاده شده است.',
 }
 
 export type ErrorMessageKey = keyof typeof errorMessage
@@ -34,6 +36,9 @@ export const successMessage = {
   yourAvatarSaved: 'عکس کاربری شما ذخیره شد.',
   yourAvatarDeleted: 'عکس کاربری شما حذف شد.',
   yourAccountDeleted: 'حساب کاربری شما حذف شد.',
+  emailVerificationSentToYourNewEmail:
+    'پیامی حاوی لینک تایید به ایمیل جدید شما فرستاده شد. بدون تایید ، ایمیل شما تغییر نخواهد یافت.',
+  emailChanged: 'ایمیل شما تغییر یافت.',
 }
 
 export type SuccessMessageKey = keyof typeof successMessage

@@ -1,5 +1,6 @@
 import { AccountAvatar } from '#/components/account/avatar.tsx'
 import { AccountDeleteMyAccount } from '#/components/account/delete-my-account.tsx'
+import { AccountEmail } from '#/components/account/email.tsx'
 import { AccountGeneralInfo } from '#/components/account/general-info.tsx'
 import {
   Tabs,
@@ -25,6 +26,9 @@ export const Route = createFileRoute('/_backend/account')({
       case 'avatar':
         tabTranslation = 'عکس کاربری'
         break
+      case 'email':
+        tabTranslation = 'ایمیل کاربری'
+        break
       case 'delete-my-account':
         tabTranslation = 'حذف حساب کاربری من'
         break
@@ -34,7 +38,7 @@ export const Route = createFileRoute('/_backend/account')({
   },
   validateSearch: z.object({
     tab: z
-      .literal(['general-info', 'avatar', 'delete-my-account'])
+      .literal(['general-info', 'avatar', 'email', 'delete-my-account'])
       .optional()
       .default('general-info')
       .catch('general-info'),
@@ -57,6 +61,11 @@ function RouteComponent() {
             عکس کاربری
           </Link>
         </TabsTrigger>
+        <TabsTrigger value="email">
+          <Link to="/account" search={{ tab: 'email' }}>
+            ایمیل کاربری
+          </Link>
+        </TabsTrigger>
         <TabsTrigger value="delete-my-account" className="text-destructive!">
           <Link to="/account" search={{ tab: 'delete-my-account' }}>
             حذف حساب کاربری من
@@ -68,6 +77,9 @@ function RouteComponent() {
       </TabsContent>
       <TabsContent value="avatar">
         <AccountAvatar />
+      </TabsContent>
+      <TabsContent value="email">
+        <AccountEmail />
       </TabsContent>
       <TabsContent value="delete-my-account">
         <AccountDeleteMyAccount />

@@ -6,7 +6,7 @@ import {
   userTable,
   verificationTable,
 } from '#/db/schema/auth-schema.server.ts'
-import { sendMagicLink } from '#/email/index.tsx'
+import { sendEmailVerification, sendMagicLink } from '#/email/index.tsx'
 import { serverEnv } from '#/lib/env/env.server.ts'
 import type { ErrorMessageKey, SuccessMessageKey } from '#/lib/message.ts'
 import { errorMessage, successMessage } from '#/lib/message.ts'
@@ -16,12 +16,13 @@ import { writeAppLog } from '#/lib/utils.server.ts'
 import { usernameZodSchema } from '#/zod-schema/username.ts'
 import { redisStorage } from '@better-auth/redis-storage'
 import type { BetterAuthOptions } from 'better-auth'
-import { betterAuth } from 'better-auth'
+import { APIError, betterAuth } from 'better-auth'
 import { localization } from 'better-auth-localization'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { createAuthMiddleware } from 'better-auth/api'
 import { customSession, magicLink, username } from 'better-auth/plugins'
 import { tanstackStartCookies } from 'better-auth/tanstack-start'
+import { eq } from 'drizzle-orm'
 import { customAlphabet } from 'nanoid'
 
 const nanoid = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz_-', 15)
@@ -80,16 +81,35 @@ const betterAuthOptions = {
     enabled: false,
   },
   hooks: {
-    before: createAuthMiddleware(async ({ request, path }) => {
+    before: createAuthMiddleware(async ({ request, path, body }) => {
       if (!request) return
 
       const pathsToBeRateLimited_throwError = [
         '/sign-in/magic-link',
         '/update-user',
+        '/change-email',
       ]
+
+      let callbackURL = '/'
+
+      if (path === '/verify-email') {
+        const callbackURLQueryParam = new URL(request.url).searchParams
+          .get('callbackURL')
+          ?.toString()
+
+        if (callbackURLQueryParam) {
+          const url = new URL(callbackURLQueryParam, serverEnv.APP_URL)
+
+          url.searchParams.delete('error')
+          url.searchParams.delete('success')
+
+          callbackURL = url.toString()
+        }
+      }
 
       const pathsToBeRateLimited_returnResponse: Record<string, string> = {
         '/magic-link/verify': '/auth',
+        '/verify-email': callbackURL,
       }
 
       if (pathsToBeRateLimited_throwError.includes(path)) {
@@ -109,6 +129,21 @@ const betterAuthOptions = {
 
         if (response) {
           return response
+        }
+      }
+
+      if (path === '/change-email') {
+        const { newEmail } = body as { newEmail: string }
+
+        const emailExists = await getDb().query.userTable.findFirst({
+          where: eq(userTable.email, newEmail),
+          columns: { id: true },
+        })
+
+        if (emailExists) {
+          throw new APIError('CONFLICT', {
+            message: errorMessage.emailIsAlreadyTaken,
+          })
         }
       }
     }),
@@ -165,6 +200,32 @@ const betterAuthOptions = {
         type: 'string',
         fieldName: 'role',
       },
+    },
+    changeEmail: {
+      enabled: true,
+      updateEmailWithoutVerification: false,
+    },
+  },
+  emailVerification: {
+    expiresIn: 30 * 60,
+    sendOnSignIn: false,
+    sendOnSignUp: false,
+    autoSignInAfterVerification: false,
+    async sendVerificationEmail({ user: { email }, url }) {
+      if (serverEnv.APP_ENV === 'production') {
+        sendEmailVerification({ to: email, url }).catch((error) => {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error)
+
+          writeAppLog({
+            content: `=== EMAIL VERIFICATION ===\n[error] ${errorMessage}\n`,
+          })
+        })
+      } else {
+        await writeAppLog({
+          content: `=== EMAIL VERIFICATION ===\n[email] ${email}\n[url]\n${url}\n`,
+        })
+      }
     },
   },
   databaseHooks: {

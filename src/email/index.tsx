@@ -1,3 +1,4 @@
+import EmailVerification from '#/email/templates/email-verification.tsx'
 import MagicLink from '#/email/templates/magic-link.tsx'
 import { serverEnv } from '#/lib/env/env.server.ts'
 import { getNodemailer } from '#/lib/nodemailer.server.ts'
@@ -38,4 +39,21 @@ export const sendMagicLink = async ({
   ])
 
   return sendMail({ to, subject: 'لینک جادویی', html, text })
+}
+
+export const sendEmailVerification = async ({
+  to,
+  url,
+}: {
+  to: string
+  url: string
+}) => {
+  const emailVerification = <EmailVerification url={url} />
+
+  const [html, text] = await Promise.all([
+    render(emailVerification),
+    render(emailVerification, { plainText: true }),
+  ])
+
+  return sendMail({ to, subject: 'تایید ایمیل', html, text })
 }
