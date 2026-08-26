@@ -55,7 +55,7 @@ export const UserDropdown = ({
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link to="/">
+            <Link to="/account">
               <UserIcon />
               حساب کاربری
             </Link>
