@@ -97,8 +97,5 @@
       "esbuild",
       "lightningcss"
     ]
-  },
-  "patchedDependencies": {
-    "@tanstack/router-ssr-query-core@1.169.1": "patches/@tanstack%2Frouter-ssr-query-core@1.169.1.patch"
   }
 }
